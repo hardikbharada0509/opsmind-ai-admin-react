@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, Upload } from "lucide-react";
 import { cn } from "../../../utils";
 import { Button } from "../../../components/common/Button";
 
@@ -26,7 +26,8 @@ const DashboardLayout: React.FC = () => {
   }, [location.pathname]);
 
   const navigation = [
-    { name: "Overview", href: "/dashboard", icon: LayoutDashboard }
+    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Upload PDF", href: "/upload-pdf", icon: Upload },
   ];
 
   const handleLogout = () => {
@@ -86,7 +87,7 @@ const DashboardLayout: React.FC = () => {
         <div className="p-4 border-t border-slate-800 space-y-2">
           <Button
             variant="ghost"
-            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-slate-800"
+            className="w-full !p-4 justify-start text-red-400 cursor-pointer hover:text-red-300 hover:bg-slate-800"
             onClick={handleLogout}
           >
             <LogOut className="mr-3 h-5 w-5" /> Logout

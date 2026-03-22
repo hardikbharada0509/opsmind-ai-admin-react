@@ -1,44 +1,63 @@
+
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import * as yup from "yup";
+import APICall from "../../../network/APICall";
+import { Const } from "../../../utils/Const";
+import { ENDPOINTS } from "../../../network/Endpoints";
+import { toast } from "react-toastify";
+
+type LoginType = {
+  username: string;
+  password: string;
+}
+
+const loginSchema = yup.object({
+  username: yup.string().required("Username is required"),
+  password: yup.string().required("Password is required"),
+});
 
 export const useLogin = () => {
-  const navigate = useNavigate();
-  
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleTogglePassword = () => setShowPassword((prev) => !prev);
+  const defaultValues = {
+    username: '',
+    password: ''
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (!username || !password) {
-      setError("Username and password are required.");
-      return;
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    mode: 'onSubmit',
+    resolver: yupResolver(loginSchema),
+    defaultValues
+  })
+  console.log(errors)
+  const onSubmit = (data: LoginType) => {
+    const payload = {
+      email: data.username,
+      password: data.password
     }
 
-    // Mock API call simulation
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      // Ensure we treat 'admin' 'admin' as valid just to mock something, or just pass automatically
-      navigate("/dashboard", { replace: true });
-    }, 1000);
-  };
-
+    APICall(Const.METHODS.POST, payload, ENDPOINTS.AUTH.LOGIN).then((res: any) => {
+      console.log(res)
+      toast.success(res.message)
+      navigate("/dashboard")
+    }).catch((err) => {
+      console.log(err)
+      toast.error(err.message)
+    })
+  }
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  }
   return {
-    username,
-    setUsername,
-    password,
-    setPassword,
+    control,
+    handleSubmit,
+    errors,
+    onSubmit,
     showPassword,
-    handleTogglePassword,
-    loading,
-    error,
-    handleSubmit
+    handleTogglePassword
   };
 };
